@@ -10,7 +10,7 @@
     "format:check": "prettier --check \"src/**/*.js\"",
     "good": "npm run format && npm run lint",
     "start": "node app.js",
-    "test": "jest --runInBand --detectOpenHandles"
+    "test": "jest --runInBand --detectOpenHandles --detectOpenHandles --forceExit"
   },
   "keywords": [],
   "author": "",

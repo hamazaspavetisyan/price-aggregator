@@ -1,8 +1,9 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env.test') });
 const request = require('supertest');
 const express = require('express');
 const PriceModel = require('./../src/modules/price/price.model');
 const api = require('./../src/api/api'); // Your route initializer
-const Exception = require('./../src/shared/exception');
 
 // Setup a dummy express app for testing
 const app = express();

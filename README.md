@@ -23,6 +23,42 @@ A Node.js application that fetches cryptocurrency prices from CoinGecko API and 
 npm install
 ```
 
+## Running Tests
+
+```bash
+npm test
+```
+
+## Development
+
+### Code Quality
+
+Run formatting and linting:
+
+```bash
+npm run good
+```
+
+This command will:
+1. Format code using Prettier
+2. Run ESLint to check for code quality issues
+
+### Individual Commands
+
+```bash
+# Format code
+npm run format
+
+# Check formatting without modifying files
+npm run format:check
+
+# Run linter
+npm run lint
+
+# Fix linting issues automatically
+npm run lint:fix
+```
+
 ## Configuration
 
 The application uses the following configuration:
@@ -42,13 +78,71 @@ npm start
 
 The application will:
 1. Connect to MongoDB
-2. Execute the price collection pipeline immediately
-3. Schedule recurring executions every 30 seconds
-4. Continue running until stopped (Ctrl+C)
+2. Start the REST API server on port 3000
+3. Execute the price collection pipeline immediately
+4. Schedule recurring executions every 30 seconds
+5. Continue running until stopped (Ctrl+C)
 
-### On-demand execution
+## API Endpoints
 
-The application can be triggered programmatically:
+### Get Latest Price
+
+Retrieve the latest price data for a specific cryptocurrency symbol.
+
+```
+GET http://127.0.0.1:3000/api/prices/latest?symbol={SYMBOL}
+```
+
+**Query Parameters:**
+- `symbol` (required): Cryptocurrency symbol (e.g., BTC, ETH, DOGE)
+
+**Example Request:**
+```bash
+curl "http://127.0.0.1:3000/api/prices/latest?symbol=BTC"
+```
+
+**Example Response:**
+```json
+{
+  "coinId": "bitcoin",
+  "coinName": "Bitcoin",
+  "symbol": "BTC",
+  "averagePrice": 68500.50,
+  "exchanges": [
+    {
+      "name": "Binance",
+      "price": 68505.00,
+      "volume": 150000000,
+      "trustScore": "green"
+    }
+  ],
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+### Sync Prices
+
+Manually trigger the price collection process for all tracked cryptocurrencies.
+
+```
+POST http://127.0.0.1:3000/api/prices/sync
+```
+
+**Example Request:**
+```bash
+curl -X POST "http://127.0.0.1:3000/api/prices/sync"
+```
+
+**Example Response:**
+```json
+{
+  "message": "Price sync completed successfully"
+}
+```
+
+### Programmatic usage
+
+The application can also be triggered programmatically:
 
 ```javascript
 const { Application } = require('./app.js');
