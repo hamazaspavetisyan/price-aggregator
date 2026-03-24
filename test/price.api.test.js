@@ -36,12 +36,12 @@ describe('Price API End-to-End Tests', () => {
                 .query({ symbol: 'btc' });
 
             expect(res.statusCode).toEqual(200);
-            expect(res.body.data.symbol).toBe('btc');
-            expect(res.body.data.averagePrice).toBe(65000);
+            expect(res.body.symbol).toBe('btc');
+            expect(res.body.averagePrice).toBe(65000);
         });
 
         it('should return 404 if the price record is stale', async () => {
-            const staleDate = new Date(Date.now() - 10000000); // Very old date
+            const staleDate = new Date(Date.now() - 1000000000); // Very old date
             const mockStalePrice = {
                 symbol: 'eth',
                 created: staleDate,
@@ -58,7 +58,7 @@ describe('Price API End-to-End Tests', () => {
                 .query({ symbol: 'eth' });
 
             // Based on your PriceService logic: throw new Exception(..., NOT_FOUND)
-            expect(res.statusCode).toEqual(200);
+            expect(res.statusCode).toEqual(404);
             expect(res.body.error).toMatch(/stale/i);
         });
 
@@ -87,10 +87,10 @@ describe('Price API End-to-End Tests', () => {
         });
     });
 
-    describe('POST /api/prices/', () => {
+    describe('POST /api/prices/sync', () => {
         it('should trigger a manual sync successfully', async () => {
             const res = await request(app)
-                .post('/api/prices/')
+                .post('/api/prices/sync')
                 .send({});
 
             expect(res.statusCode).toEqual(200);

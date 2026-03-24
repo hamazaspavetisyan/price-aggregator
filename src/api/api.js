@@ -1,5 +1,5 @@
 const routes = {
-    price: require('./routes/price')
+    prices: require('./routes/price')
 };
 
 const initialize = (app) => {
