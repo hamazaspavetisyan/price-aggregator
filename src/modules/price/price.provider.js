@@ -1,5 +1,6 @@
 const utl = require('../../shared/utl');
 const appUtl = require('../../shared/app-utl');
+const Exception = require('../../shared/exception');
 const config = require('../../shared/config');
 const axios = require('axios');
 const PriceModel = require('./price.model');
@@ -23,7 +24,7 @@ class PriceService {
      */
     static async fetchAndStorePrices() {
         try {
-            appUtl.log.info('Starting price collection pipeline...');
+            appUtl.log.info('starting price collection pipeline...');
             const dataProviderUrl = config.getString('DATA_PROVIDER_URL');
             const topCurrenciesLimit = config.getNumber('TOP_CURRENCIES_LIMIT');
 
@@ -38,7 +39,7 @@ class PriceService {
             );
 
             appUtl.log.debug(
-                `Fetching top ${topCurrenciesLimit} cryptocurrencies by market cap`
+                `fetching top ${topCurrenciesLimit} cryptocurrencies by market cap`
             );
 
             // Step 1: Get top N coins by market cap
@@ -59,12 +60,12 @@ class PriceService {
                 .slice(0, topCurrenciesLimit);
 
             appUtl.log.info(
-                `Found ${allTopCoins.length} cryptocurrencies to process`
+                `found ${allTopCoins.length} cryptocurrencies to process`
             );
 
             // Step 2: Process each cryptocurrency
             for (const coin of allTopCoins) {
-                appUtl.log.debug(`Processing ${coin.symbol} (${coin.name})`);
+                appUtl.log.debug(`processing ${coin.symbol} (${coin.name})`);
 
                 // Fetch tickers for this coin to find top exchanges
                 const tickerRes = await axios.get(
@@ -88,7 +89,7 @@ class PriceService {
                 // Skip coins with no valid tickers
                 if (topTickers.length === 0) {
                     appUtl.log.warn(
-                        `No valid USDT tickers found for ${coin.symbol}, skipping`
+                        `no valid USDT tickers found for ${coin.symbol}, skipping`
                     );
                     continue;
                 }
@@ -116,15 +117,15 @@ class PriceService {
                 });
 
                 appUtl.log.info(
-                    `Successfully stored price data for ${coin.symbol}`
+                    `successfully stored price data for ${coin.symbol}`
                 );
             }
 
-            appUtl.log.info('Price collection completed successfully');
+            appUtl.log.info('price collection completed successfully');
         } catch (error) {
-            appUtl.log.error(`Price pipeline error: ${error.message}`);
+            appUtl.log.error(`price pipeline error: ${error.message}`);
             // In production, you might implement retry logic or alerts here
-            throw error; // Re-throw to allow caller to handle
+            throw new Exception(error.message, error?.status || Exception.Code.SYSTEM); // Re-throw to allow caller to handle
         }
     }
 }

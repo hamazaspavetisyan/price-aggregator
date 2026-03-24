@@ -17,7 +17,7 @@ const routes = {
  * @param {Express.Application} app - Express application instance
  */
 const initialize = (app) => {
-    appUtl.log.info('Initializing API routes...');
+    appUtl.log.info('initializing API routes...');
 
     // Middleware placeholder for future cross-cutting concerns
     app.use((req, res, next) => {
@@ -28,7 +28,7 @@ const initialize = (app) => {
     Object.keys(routes).forEach((route) => {
         const routePath = `/api/${route}/`;
         app.use(routePath, routes[route]);
-        appUtl.log.debug(`Registered route: ${routePath}`);
+        appUtl.log.debug(`registered route: ${routePath}`);
     });
 
     appUtl.log.info(

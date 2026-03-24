@@ -23,12 +23,12 @@ const url = `${mongoHost}/${mongoDb}`;
 
 // Connection error handler
 mongoose.connection.on('error', function (err) {
-    appUtl.log.error(`Cannot connect to MongoDB: ${err.message}`);
+    appUtl.log.error(`cannot connect to MongoDB: ${err.message}`);
 });
 
 // Connection success handler
 mongoose.connection.once('open', function () {
-    appUtl.log.debug(`Connection to database established: ${url}`);
+    appUtl.log.debug(`connection to database established: ${url}`);
 });
 
 // Disable mongoose debug mode (set to true for development debugging)

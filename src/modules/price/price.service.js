@@ -24,14 +24,14 @@ class PriceService {
      * @throws {Exception} If symbol is invalid, not found, or price is stale
      */
     static async getLatestPrices(symbol) {
-        appUtl.log.debug(`Retrieving latest price for symbol: ${symbol}`);
+        appUtl.log.debug(`retrieving latest price for symbol: ${symbol}`);
 
         // Validate symbol length to prevent potential attacks or invalid queries
         const masSymbolLength = config.getNumber('SYMBOL_MAX_LENGTH');
         utl.assert(!!masSymbolLength, 'SYMBOL_MAX_LENGTH must be set in .env');
         if (symbol.length > parseInt(masSymbolLength, 10)) {
             appUtl.log.warn(
-                `Symbol too long: ${symbol} (max: ${masSymbolLength})`
+                `symbol too long: ${symbol} (max: ${masSymbolLength})`
             );
             throw new Exception('symbol too long', Exception.Code.BAD_REQUEST);
         }
@@ -39,7 +39,7 @@ class PriceService {
         // Query database for the most recent price entry
         const { list } = await PriceModel.search({ symbol, itemsPerPage: 1 });
         if (list.length === 0) {
-            appUtl.log.warn(`Price not found for symbol: ${symbol}`);
+            appUtl.log.warn(`price not found for symbol: ${symbol}`);
             throw new Exception(
                 `price not found for ${symbol}`,
                 Exception.Code.NOT_FOUND
@@ -53,7 +53,7 @@ class PriceService {
         const ageSeconds = (Date.now() - list[0].created.getTime()) / 1000;
         if (ageSeconds > priceStalenessThreshold) {
             appUtl.log.warn(
-                `Price is stale for ${symbol}: ${ageSeconds.toFixed(0)}s old (threshold: ${priceStalenessThreshold}s)`
+                `price is stale for ${symbol}: ${ageSeconds.toFixed(0)}s old (threshold: ${priceStalenessThreshold}s)`
             );
             throw new Exception(
                 `price is stale for ${symbol}`,
@@ -61,7 +61,7 @@ class PriceService {
             );
         }
 
-        appUtl.log.info(`Successfully retrieved latest price for ${symbol}`);
+        appUtl.log.info(`successfully retrieved latest price for ${symbol}`);
         return list[0].entitize();
     }
 
@@ -72,9 +72,9 @@ class PriceService {
      * @returns {Promise<void>}
      */
     static async triggerSync() {
-        appUtl.log.info('Triggering on-demand price synchronization');
+        appUtl.log.info('triggering on-demand price synchronization');
         await PriceProvider.fetchAndStorePrices();
-        appUtl.log.info('On-demand price synchronization completed');
+        appUtl.log.info('on-demand price synchronization completed');
     }
 
     /**
@@ -94,24 +94,24 @@ class PriceService {
         const intervalMs = intervalSeconds * 1000;
 
         appUtl.log.info(
-            `Starting price sync scheduler with ${intervalSeconds}s interval`
+            `starting price sync scheduler with ${intervalSeconds}s interval`
         );
 
         const run = async () => {
             try {
                 appUtl.log.info(
-                    `Price sync job started at ${new Date().toISOString()}`
+                    `price sync job started at ${new Date().toISOString()}`
                 );
                 await this.triggerSync();
-                appUtl.log.info('Price sync job completed successfully');
+                appUtl.log.info('price sync job completed successfully');
             } catch (err) {
                 // Catch errors to prevent scheduler from dying on API failures
-                appUtl.log.error(`Price sync job failed: ${err.message}`);
+                appUtl.log.error(`price sync job failed: ${err.message}`);
             } finally {
                 // Schedule next run ONLY after current execution finishes
                 // This prevents overlapping executions if sync takes longer than interval
                 appUtl.log.debug(
-                    `Next price sync scheduled in ${intervalSeconds}s`
+                    `next price sync scheduled in ${intervalSeconds}s`
                 );
                 setTimeout(run, intervalMs);
             }

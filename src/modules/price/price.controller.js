@@ -14,7 +14,7 @@ const appUtl = require('../../shared/app-utl');
  */
 function getLatestPrices(params) {
     const { symbol } = params.query;
-    appUtl.log.info(`Fetching latest price for symbol: ${symbol}`);
+    appUtl.log.info(`fetching latest price for symbol: ${symbol}`);
     return PriceService.getLatestPrices(symbol);
 }
 
@@ -24,7 +24,7 @@ function getLatestPrices(params) {
  * @returns {Promise<void>}
  */
 function triggerManualSync() {
-    appUtl.log.info('Manual price sync triggered via API');
+    appUtl.log.info('manual price sync triggered via API');
     return PriceService.triggerSync();
 }
 
