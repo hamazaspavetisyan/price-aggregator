@@ -125,7 +125,10 @@ class PriceService {
         } catch (error) {
             appUtl.log.error(`price pipeline error: ${error.message}`);
             // In production, you might implement retry logic or alerts here
-            throw new Exception(error.message, error?.status || Exception.Code.SYSTEM); // Re-throw to allow caller to handle
+            throw new Exception(
+                error.message,
+                error?.status || Exception.Code.SYSTEM
+            ); // Re-throw to allow caller to handle
         }
     }
 }

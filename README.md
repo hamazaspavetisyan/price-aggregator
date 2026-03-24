@@ -202,6 +202,23 @@ The application handles the following data quality issues:
 1. `/coins/markets` - Get top cryptocurrencies by market cap
 2. `/coins/{id}/tickers` - Get exchange tickers for specific cryptocurrency
 
+## RPC node
+RPC node exposes api named `ping` and `getLatestPrice`
+
+Run bootstrapper first for local usage
+```bash
+hyperdht --bootstrap --host 127.0.0.1 --port 30001
+```
+
+Then use comand below for getting the price
+
+```bash
+hp-rpc-cli -s RPC_LISTENING_PUBIC_KEY -m getLatestPrice -d '{"symbol": "BTC"}'
+```
+
+`RPC_LISTENING_PUBIC_KEY` can be taken from logs of te server 
+
+
 ## Notes
 
 - The application prioritizes exchanges with higher trust scores and trading volume

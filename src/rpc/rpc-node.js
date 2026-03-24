@@ -53,7 +53,6 @@ class RpcNode {
             appUtl.log.info(
                 `🎧 RPC server listening on public key -> ${this.rpcServer.publicKey.toString('hex')}`
             );
-
         } catch (err) {
             appUtl.log.error(`failed to start RPC server: ${err.message}`);
             throw err;
@@ -82,16 +81,19 @@ class RpcNode {
                 const requestStr = rawRequest.toString();
                 appUtl.log.debug(`RPC ping received: ${requestStr}`);
 
-                return Buffer.from(JSON.stringify({
-                    value: 'pong',
-                    timestamp: Date.now()
-                }));
-
+                return Buffer.from(
+                    JSON.stringify({
+                        value: 'pong',
+                        timestamp: Date.now()
+                    })
+                );
             } catch (err) {
                 appUtl.log.error(`RPC ping handler error: ${err.message}`);
-                return Buffer.from(JSON.stringify({
-                    error: `invalid request: ${err.message}`
-                }));
+                return Buffer.from(
+                    JSON.stringify({
+                        error: `invalid request: ${err.message}`
+                    })
+                );
             }
         });
 
@@ -106,32 +108,41 @@ class RpcNode {
                     throw new Error('symbol is required');
                 }
 
-                appUtl.log.debug(`RPC getLatestPrice requested for symbol: ${symbol}`);
+                appUtl.log.debug(
+                    `RPC getLatestPrice requested for symbol: ${symbol}`
+                );
 
                 // Call your existing PriceService method
                 const priceData = await PriceService.getLatestPrices(symbol);
 
-                appUtl.log.info(`RPC successfully returned price for ${symbol}`);
+                appUtl.log.info(
+                    `RPC successfully returned price for ${symbol}`
+                );
 
-                return Buffer.from(JSON.stringify({
-                    success: true,
-                    data: priceData
-                }));
-
+                return Buffer.from(
+                    JSON.stringify({
+                        success: true,
+                        data: priceData
+                    })
+                );
             } catch (err) {
                 const errorMsg = err.message || 'Unknown error';
 
                 // Log with appropriate level
                 if (err.code === 'BAD_REQUEST' || err.code === 'NOT_FOUND') {
-                    appUtl.log.warn(`RPC getLatestPrice failed for symbol: ${errorMsg}`);
+                    appUtl.log.warn(
+                        `RPC getLatestPrice failed for symbol: ${errorMsg}`
+                    );
                 } else {
                     appUtl.log.error(`RPC getLatestPrice error: ${errorMsg}`);
                 }
 
-                return Buffer.from(JSON.stringify({
-                    success: false,
-                    error: errorMsg
-                }));
+                return Buffer.from(
+                    JSON.stringify({
+                        success: false,
+                        error: errorMsg
+                    })
+                );
             }
         });
     }
