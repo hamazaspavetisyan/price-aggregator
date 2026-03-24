@@ -5,43 +5,87 @@ const config = require('../../shared/config');
 const utl = require('../../shared/utl');
 const appUtl = require('../../shared/app-utl');
 
+/**
+ * Price Service
+ * Business logic layer for cryptocurrency price operations
+ * Handles price retrieval, validation, and synchronization scheduling
+ */
 class PriceService {
+    /**
+     * Retrieves the latest price data for a given cryptocurrency symbol
+     *
+     * Validates:
+     * - Symbol length (security check)
+     * - Price exists in database
+     * - Price is not stale (based on configured threshold)
+     *
+     * @param {string} symbol - Cryptocurrency symbol (e.g., BTC, ETH)
+     * @returns {Promise<Object>} Latest price data with exchange information
+     * @throws {Exception} If symbol is invalid, not found, or price is stale
+     */
     static async getLatestPrices(symbol) {
+        appUtl.log.debug(`Retrieving latest price for symbol: ${symbol}`);
+
+        // Validate symbol length to prevent potential attacks or invalid queries
         const masSymbolLength = config.getNumber('SYMBOL_MAX_LENGTH');
         utl.assert(!!masSymbolLength, 'SYMBOL_MAX_LENGTH must be set in .env');
         if (symbol.length > parseInt(masSymbolLength, 10)) {
-            // I prefer parseInt rather than casting to NaN
+            appUtl.log.warn(
+                `Symbol too long: ${symbol} (max: ${masSymbolLength})`
+            );
             throw new Exception('symbol too long', Exception.Code.BAD_REQUEST);
         }
 
-        const { list } = await PriceModel.search({ symbol, itemsPerPage: 1 }); // will return the last one
+        // Query database for the most recent price entry
+        const { list } = await PriceModel.search({ symbol, itemsPerPage: 1 });
         if (list.length === 0) {
+            appUtl.log.warn(`Price not found for symbol: ${symbol}`);
             throw new Exception(
                 `price not found for ${symbol}`,
                 Exception.Code.NOT_FOUND
             );
         }
 
+        // Check if price data is fresh (not stale)
         const priceStalenessThreshold = config.getNumber(
             'PRICE_STALENESS_THRESHOLD_SECONDS'
         );
-        if (Date.now() - list[0].created.getTime() >
-            priceStalenessThreshold * 1000
-        ) {
+        const ageSeconds = (Date.now() - list[0].created.getTime()) / 1000;
+        if (ageSeconds > priceStalenessThreshold) {
+            appUtl.log.warn(
+                `Price is stale for ${symbol}: ${ageSeconds.toFixed(0)}s old (threshold: ${priceStalenessThreshold}s)`
+            );
             throw new Exception(
                 `price is stale for ${symbol}`,
                 Exception.Code.NOT_FOUND
             );
         }
 
+        appUtl.log.info(`Successfully retrieved latest price for ${symbol}`);
         return list[0].entitize();
     }
 
+    /**
+     * Manually trigger price synchronization
+     * Fetches and stores latest prices for all tracked cryptocurrencies
+     *
+     * @returns {Promise<void>}
+     */
     static async triggerSync() {
-        // On-demand execution
+        appUtl.log.info('Triggering on-demand price synchronization');
         await PriceProvider.fetchAndStorePrices();
+        appUtl.log.info('On-demand price synchronization completed');
     }
 
+    /**
+     * Starts the automatic price synchronization scheduler
+     *
+     * Runs continuously with configured interval between executions.
+     * Each sync waits for completion before scheduling the next run.
+     * Errors are caught and logged to prevent scheduler from stopping.
+     *
+     * @returns {void}
+     */
     static startPriceSync() {
         const intervalSeconds = config.getNumber(
             'PRICE_SYNC_INTERVAL_SECONDS',
@@ -49,20 +93,31 @@ class PriceService {
         );
         const intervalMs = intervalSeconds * 1000;
 
+        appUtl.log.info(
+            `Starting price sync scheduler with ${intervalSeconds}s interval`
+        );
+
         const run = async () => {
             try {
-                appUtl.log.info(`price sync job started at ${new Date()}`);
+                appUtl.log.info(
+                    `Price sync job started at ${new Date().toISOString()}`
+                );
                 await this.triggerSync();
+                appUtl.log.info('Price sync job completed successfully');
             } catch (err) {
-                // We catch here so the scheduler doesn't die on a single API error
-                appUtl.log.error(`price Sync Job Failed: ${err.message}`);
+                // Catch errors to prevent scheduler from dying on API failures
+                appUtl.log.error(`Price sync job failed: ${err.message}`);
             } finally {
-                // Schedule the next run ONLY after the current one is finished
+                // Schedule next run ONLY after current execution finishes
+                // This prevents overlapping executions if sync takes longer than interval
+                appUtl.log.debug(
+                    `Next price sync scheduled in ${intervalSeconds}s`
+                );
                 setTimeout(run, intervalMs);
             }
         };
 
-        // Start the first execution
+        // Start the first execution immediately
         void run();
     }
 }

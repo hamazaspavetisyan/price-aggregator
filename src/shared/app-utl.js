@@ -15,18 +15,18 @@ module.exports.jsonOutHandler = function (err, result, out) {
 
     if (err) {
         if (err instanceof Exception) {
-            response = {error: err.message};
+            response = { error: err.message };
             logger.error(err.message);
             httpStatus = err.code;
         } else if (err instanceof Error) {
-            response = {error: err.toString()};
+            response = { error: err.toString() };
             logger.error(err.toString());
 
             logger.error(err.name);
             logger.error(err.stack);
             httpStatus = Exception.Code.SYSTEM;
         } else if (typeof err === 'string') {
-            response = {error: err};
+            response = { error: err };
             logger.error(err);
             httpStatus = Exception.Code.UNKNOWN_FROM_STRING;
         } else {

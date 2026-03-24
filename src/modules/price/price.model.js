@@ -14,6 +14,7 @@ const PriceSchema = mongoose.Schema({
     pair: { type: String, default: 'usd' },
     averagePrice: { type: Number, required: true },
     sources: [PriceSourceSchema] // Metadata about top 3 exchanges
+    // timestamps will be crated automatically, see mongoose-ex
 });
 
 PriceSchema.statics.search = async function ({
