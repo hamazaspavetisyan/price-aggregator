@@ -14,6 +14,7 @@ API can be changed or deprecated.
 
 Q4 — Hyperswarm RPC - Optional
 Had you used Hyperswarm RPC (or any Holepunch libraries) before this task? Describe briefly how you approached learning / integrating it. What surprised you or what would you do differently next time?
+The RPC node functions correctly as a standalone process but fails when integrated into the price-aggregator suite. I'm investigating the integration logic now but won't be committing these debug fixes yet. First time using Hyperswarm—the performance is impressive. However, I'm still clarifying the distinction between DHT keys for discovery versus RPC addressing.
 Q5 — Testing Strategy
 Describe your testing approach. What did you prioritize testing and why? If you had more time, what additional tests would you add?
 As the time was limited, I just covered several important cases using jest. Had no time to mock the response of the provider.
