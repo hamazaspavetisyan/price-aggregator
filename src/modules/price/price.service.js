@@ -25,8 +25,7 @@ class PriceService {
         const priceStalenessThreshold = config.getNumber(
             'PRICE_STALENESS_THRESHOLD_SECONDS'
         );
-        if (
-            Date.now() - list[0].created.getTime() >
+        if (Date.now() - list[0].created.getTime() >
             priceStalenessThreshold * 1000
         ) {
             throw new Exception(

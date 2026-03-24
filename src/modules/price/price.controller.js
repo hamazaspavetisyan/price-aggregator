@@ -1,7 +1,7 @@
 const PriceService = require('./price.service');
 
 function getLatestPrices(params) {
-    const { symbol } = params.body;
+    const { symbol } = params.query;
     return PriceService.getLatestPrices(symbol);
 }
 

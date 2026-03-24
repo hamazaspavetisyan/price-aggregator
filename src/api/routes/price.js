@@ -12,13 +12,14 @@ router.post(
     addHandler(triggerManualSync, /*['user'] no auth in this project*/ null, {})
 );
 
-router.post(
+router.get(
     '/latest',
     addHandler(
         getLatestPrices,
         /*['user', 'admin'] no auth in this project*/ null,
         {
-            body: Params().required('symbol', 'str')
+            query: Params().required('symbol', 'str')
+            //body: Params().required('symbol', 'str')
         }
     )
 );

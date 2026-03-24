@@ -11,29 +11,34 @@ module.exports.httpStream = {
 
 module.exports.jsonOutHandler = function (err, result, out) {
     let response;
+    let httpStatus = 200; // Default
 
     if (err) {
         if (err instanceof Exception) {
-            response = err;
+            response = {error: err.message};
             logger.error(err.message);
+            httpStatus = err.code;
         } else if (err instanceof Error) {
-            response = new Exception(err.toString(), Exception.Code.SYSTEM);
+            response = {error: err.toString()};
             logger.error(err.toString());
 
             logger.error(err.name);
             logger.error(err.stack);
+            httpStatus = Exception.Code.SYSTEM;
         } else if (typeof err === 'string') {
-            response = new Exception(err, Exception.Code.UNKNOWN_FROM_STRING);
+            response = {error: err};
             logger.error(err);
+            httpStatus = Exception.Code.UNKNOWN_FROM_STRING;
         } else {
             response = new Exception('Unknown error', Exception.Code.UNKNOWN);
             logger.error(err);
+            httpStatus = Exception.Code.UNKNOWN;
         }
     } else {
         response = result;
     }
 
-    out.json(response);
+    out.status(httpStatus).json(response);
 };
 
 module.exports.endpoint = (fn) => (req, res) => {

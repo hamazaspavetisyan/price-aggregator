@@ -10,7 +10,7 @@
     "format:check": "prettier --check \"src/**/*.js\"",
     "good": "npm run format && npm run lint",
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +26,7 @@
     "mongoose": "^9.3.2",
     "morgan": "^1.10.1",
     "node-cron": "^4.2.1",
+    "supertest": "^7.2.2",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
@@ -34,6 +35,7 @@
     "@eslint/js": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "jest": "^30.3.0",
     "prettier": "^3.8.1"
   }
 }
