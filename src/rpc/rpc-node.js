@@ -8,7 +8,7 @@ const appUtl = require('../shared/app-utl');
 const PriceService = require('../modules/price/price.service');
 
 class RpcNode {
-    constructor(storagePath = '../db/rpc-server') {
+    constructor(storagePath = './db/rpc-server') {
         this.storagePath = storagePath;
         this.hcore = null;
         this.hbee = null;
@@ -30,7 +30,7 @@ class RpcNode {
             appUtl.log.info('Hyperbee storage ready');
 
             // 2. DHT with persisted seed
-            const dhtSeed = await this._getOrCreateSeed('dht-seed');
+            const dhtSeed = await this.getOrCreateSeed('dht-seed');
             this.dht = new DHT({
                 port: 40001,
                 keyPair: DHT.keyPair(dhtSeed),
@@ -41,12 +41,12 @@ class RpcNode {
             appUtl.log.info('DHT ready');
 
             // 3. RPC with persisted seed
-            const rpcSeed = await this._getOrCreateSeed('rpc-seed');
+            const rpcSeed = await this.getOrCreateSeed('rpc-seed');
             this.rpc = new RPC({ seed: rpcSeed, dht: this.dht });
             this.rpcServer = this.rpc.createServer();
 
             // 4. Register handlers
-            this._setupHandlers();
+            this.setupHandlers();
 
             await this.rpcServer.listen();
 
@@ -60,7 +60,7 @@ class RpcNode {
         }
     }
 
-    async _getOrCreateSeed(key) {
+    async getOrCreateSeed(key) {
         let entry = await this.hbee.get(key);
         let seed = entry ? entry.value : null;
 
@@ -75,7 +75,7 @@ class RpcNode {
         return seed;
     }
 
-    _setupHandlers() {
+    setupHandlers() {
         // Ping handler
         this.rpcServer.respond('ping', async (rawRequest) => {
             try {
@@ -95,6 +95,7 @@ class RpcNode {
             }
         });
 
+        // our price handler
         this.rpcServer.respond('getLatestPrice', async (rawRequest) => {
             try {
                 // Parse incoming request

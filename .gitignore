@@ -11,6 +11,7 @@ files/
 /out-tsc
 /exchange-build
 /assets/receipt.html
+db
 
 # dependencies
 node_modules
