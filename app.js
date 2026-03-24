@@ -8,7 +8,7 @@ const appUtl = require('./src/shared/app-utl');
 const Exception = require('./src/shared/exception');
 const PriceService = require('./src/modules/price/price.service');
 const loggingEnabled = true;
-
+const RpcNode = require('./src/rpc/rpc-node');
 const config = require('./src/shared/config');
 
 const app = express();
@@ -76,13 +76,31 @@ app.use(function (err, req, res, next) {
     next();
 });
 
-appUtl.log.info('Initializing system ..');
+appUtl.log.info('lnitializing system ..');
 
-app.listen(config.getNumber('LISTENING_PORT'), () => {
+app.listen(config.getNumber('LISTENING_PORT'), async () => {
     const port = config.getNumber('LISTENING_PORT');
-    appUtl.log.info(`Listening on: ${port}`);
+    appUtl.log.info(`listening on: ${port}`);
 
+    appUtl.log.info('lnitializing price service ..');
     PriceService.startPriceSync();
+
+    appUtl.log.info('staring RPC node');
+    // 2. Start RPC server in parallel
+    const rpcNode = new RpcNode();
+    try {
+         await rpcNode.start();
+    } catch (err) {
+        appUtl.log.error('failed to start RPC server:', err);
+        process.exit(1);
+    }
+
+    // Graceful shutdown
+    process.on('SIGINT', async () => {
+        console.log('\nshutting down...');
+        await rpcNode.stop();
+        process.exit(0);
+    });
 }).on('error', function (err) {
     appUtl.log.error(err.message);
 });
