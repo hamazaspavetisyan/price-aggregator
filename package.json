@@ -1,0 +1,39 @@
+{
+  "name": "assignment-tether",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "lint": "eslint --ext .js src",
+    "lint:fix": "eslint --ext .js src --fix",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\"",
+    "good": "npm run format && npm run lint",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.13.6",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
+    "mongoose": "^9.3.2",
+    "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "prettier": "^3.8.1"
+  }
+}
