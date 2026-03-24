@@ -76,13 +76,13 @@ app.use(function (err, req, res, next) {
     next();
 });
 
-appUtl.log.info('lnitializing system ..');
+appUtl.log.info('initializing system ..');
 
 app.listen(config.getNumber('LISTENING_PORT'), async () => {
     const port = config.getNumber('LISTENING_PORT');
-    appUtl.log.info(`listening on: ${port}`);
+    appUtl.log.info(`🎧 listening on: ${port}`);
 
-    appUtl.log.info('lnitializing price service ..');
+    appUtl.log.info('initializing price service ..');
     PriceService.startPriceSync();
 
     appUtl.log.info('staring RPC node');
